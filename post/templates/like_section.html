@@ -1,0 +1,10 @@
+<form action="{% url 'likes' %}" method="POST" class='like-form like-form{{post.id}}' id='{{post.id}}'>
+      {% csrf_token %}
+       {% load custom_tags %}
+      {% if post|liked:user.id %}
+      <button type='submit' class="likebtn likebtn{{post.id}}" id="{{post.id}}" value="unlike">unlike</button>
+      {% else %}
+      <button type='submit' class="likebtn likebtn{{post.id}}" id="{{post.id}}" value="like">like</button>
+      {% endif %}
+      <p id="total{{post.id}}">{{ post.total_likes }}</p>
+    </form>

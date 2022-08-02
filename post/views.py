@@ -1,14 +1,17 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.template.loader import render_to_string
+
 from .models import Post, Like
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 
 
 @login_required
 def index(request):
     posts = Post.objects.all()
-    return render(request, 'home.html', {'posts': posts})
+    # return render(request, 'home.html', {'posts': posts})
+    return render(request, 'home_section.html', {'posts': posts})
 
 
 # this tutorial : https://www.geeksforgeeks.org/handling-ajax-request-in-django/
@@ -16,7 +19,6 @@ def like_post(request):
     if request.method == 'POST':
         post_id = request.POST.get('post_id')
         action = request.POST.get('action')
-
         try:
             post = Post.objects.get(pk=post_id)
         except ObjectDoesNotExist:
@@ -28,19 +30,18 @@ def like_post(request):
             message = f'Liked post :{post.heading}!'
 
         elif action == 'unlike':
-            try:
-                like = Like.objects.filter(post=post, user=request.user).latest('id')
-                like.delete()
-            except ObjectDoesNotExist:
-                message = "You can't unlike this post"
-                return HttpResponse(message)
 
+            like = Like.objects.filter(post=post, user=request.user).latest('id')
+            like.delete()
             message = f'Unliked post :{post.heading}!'
 
         else:
             message = 'idk what action'
 
-        return HttpResponse(message)
+        # return HttpResponse(message)
+        html = render_to_string('like_section.html', {'post': post}, request=request)
+        return JsonResponse({'form': html, 'message': message})
+
     else:
         return HttpResponse('Not a post request')
 
