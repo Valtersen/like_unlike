@@ -10,11 +10,9 @@ from django.core.exceptions import ObjectDoesNotExist
 @login_required
 def index(request):
     posts = Post.objects.all()
-    # return render(request, 'home.html', {'posts': posts})
-    return render(request, 'home_section.html', {'posts': posts})
+    return render(request, 'home.html', {'posts': posts})
 
 
-# this tutorial : https://www.geeksforgeeks.org/handling-ajax-request-in-django/
 def like_post(request):
     if request.method == 'POST':
         post_id = request.POST.get('post_id')
@@ -30,7 +28,6 @@ def like_post(request):
             message = f'Liked post :{post.heading}!'
 
         elif action == 'unlike':
-
             like = Like.objects.filter(post=post, user=request.user).latest('id')
             like.delete()
             message = f'Unliked post :{post.heading}!'
@@ -38,7 +35,6 @@ def like_post(request):
         else:
             message = 'idk what action'
 
-        # return HttpResponse(message)
         html = render_to_string('like_section.html', {'post': post}, request=request)
         return JsonResponse({'form': html, 'message': message})
 
